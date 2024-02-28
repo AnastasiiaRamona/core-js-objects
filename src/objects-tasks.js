@@ -379,100 +379,33 @@ function group(array, keySelector, valueSelector) {
  *  For more examples see unit tests.
  */
 
-class CssSelectorBuilder {
-  constructor() {
-    this.selector = '';
-    this.seen = {
-      element: false,
-      id: false,
-      class: false,
-      attr: false,
-      pseudoClass: false,
-      pseudoElement: false,
-    };
-  }
-
-  element(value) {
-    this.checkSingleUsage('element');
-    this.selector += value;
-    return this;
-  }
-
-  id(value) {
-    this.checkSingleUsage('id');
-    this.selector += `#${value}`;
-    return this;
-  }
-
-  class(value) {
-    const classBuilder = new CssSelectorBuilder();
-    classBuilder.selector += `.${value}`;
-    classBuilder.seen.class = true;
-    return classBuilder;
-  }
-
-  attr(value) {
-    this.checkSingleUsage('attr');
-    this.selector += `[${value}]`;
-    return this;
-  }
-
-  pseudoClass(value) {
-    this.checkSingleUsage('pseudoClass');
-    this.selector += `:${value}`;
-    return this;
-  }
-
-  pseudoElement(value) {
-    this.checkSingleUsage('pseudoElement');
-    this.selector += `::${value}`;
-    return this;
-  }
-
-  combine(selector1, combinator, selector2) {
-    this.selector = `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
-    return this;
-  }
-
-  stringify() {
-    return this.selector;
-  }
-
-  checkSingleUsage(selectorType) {
-    if (this.seen[selectorType]) {
-      throw new Error(`${selectorType} selector can only be specified once.`);
-    }
-    this.seen[selectorType] = true;
-  }
-}
-
 const cssSelectorBuilder = {
-  element(value) {
-    return new CssSelectorBuilder().element(value);
+  element(/* value */) {
+    throw new Error('Not implemented');
   },
 
-  id(value) {
-    return new CssSelectorBuilder().id(value);
+  id(/* value */) {
+    throw new Error('Not implemented');
   },
 
-  class: (value) => {
-    return new CssSelectorBuilder().class(value);
+  class(/* value */) {
+    throw new Error('Not implemented');
   },
 
-  attr(value) {
-    return new CssSelectorBuilder().attr(value);
+  attr(/* value */) {
+    throw new Error('Not implemented');
   },
 
-  pseudoClass(value) {
-    return new CssSelectorBuilder().pseudoClass(value);
+  pseudoClass(/* value */) {
+    throw new Error('Not implemented');
   },
 
-  pseudoElement(value) {
-    return new CssSelectorBuilder().pseudoElement(value);
+  pseudoElement(/* value */) {
+    throw new Error('Not implemented');
   },
 
-  combine(selector1, combinator, selector2) {
-    return new CssSelectorBuilder().combine(selector1, combinator, selector2);
+  combine(/* selector1, combinator, selector2 */) {
+    throw new Error('Not implemented');
   },
 };
 
