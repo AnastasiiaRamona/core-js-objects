@@ -379,35 +379,232 @@ function group(array, keySelector, valueSelector) {
  *  For more examples see unit tests.
  */
 
-const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
-  },
+class CssBuilder {
+  selectorsList = [];
 
-  id(/* value */) {
-    throw new Error('Not implemented');
-  },
+  selectorsOrder = {
+    element: 0,
+    id: 1,
+    class: 2,
+    attribute: 3,
+    'pseudo-class': 4,
+    'pseudo-element': 5,
+  };
 
-  class(/* value */) {
-    throw new Error('Not implemented');
-  },
+  lastCall = 0;
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
-  },
+  callLimits = {
+    element: 0,
+    id: 0,
+    pseudoElement: 0,
+  };
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
-  },
+  isOriginal;
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
-  },
+  constructor(status) {
+    this.isOriginal = status;
+  }
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
-  },
-};
+  element(title) {
+    if (!title) {
+      return this;
+    }
+
+    const selectorOrder = this.selectorsOrder.element;
+    if (selectorOrder < this.lastCall) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    copyOfBuilder.lastCall = selectorOrder;
+    if (!this.isOriginal) {
+      copyOfBuilder.selectorsList = this.selectorsList;
+      copyOfBuilder.callLimits = this.callLimits;
+    }
+
+    const prefix = ' ';
+    if (!copyOfBuilder.selectorsList.length) {
+      copyOfBuilder.selectorsList.push(title);
+    } else {
+      copyOfBuilder.selectorsList.push(prefix + title);
+    }
+
+    if (copyOfBuilder.callLimits.element > 0) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    } else {
+      copyOfBuilder.callLimits.element += 1;
+    }
+
+    return copyOfBuilder;
+  }
+
+  id(id) {
+    if (!id) {
+      return this;
+    }
+
+    const selectorOrder = this.selectorsOrder.id;
+    if (selectorOrder < this.lastCall) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    copyOfBuilder.lastCall = selectorOrder;
+    if (!this.isOriginal) {
+      copyOfBuilder.selectorsList = this.selectorsList;
+      copyOfBuilder.callLimits = this.callLimits;
+    }
+
+    if (copyOfBuilder.callLimits.id > 0) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    } else {
+      copyOfBuilder.callLimits.id += 1;
+    }
+
+    const prefix = '#';
+    copyOfBuilder.selectorsList.push(prefix + id);
+    return copyOfBuilder;
+  }
+
+  class(name) {
+    if (!name) {
+      return this;
+    }
+
+    const selectorOrder = this.selectorsOrder.class;
+    if (selectorOrder < this.lastCall) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    copyOfBuilder.lastCall = selectorOrder;
+    if (!this.isOriginal) {
+      copyOfBuilder.selectorsList = this.selectorsList;
+      copyOfBuilder.callLimits = this.callLimits;
+    }
+
+    const prefix = '.';
+    copyOfBuilder.selectorsList.push(prefix + name);
+    return copyOfBuilder;
+  }
+
+  attr(value) {
+    if (!value) {
+      return this;
+    }
+
+    const selectorOrder = this.selectorsOrder.attribute;
+    if (selectorOrder < this.lastCall) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    copyOfBuilder.lastCall = selectorOrder;
+    if (!this.isOriginal) {
+      copyOfBuilder.selectorsList = this.selectorsList;
+      copyOfBuilder.callLimits = this.callLimits;
+    }
+
+    const pattern = `[${value}]`;
+    copyOfBuilder.selectorsList.push(pattern);
+    return copyOfBuilder;
+  }
+
+  pseudoClass(name) {
+    if (!name) {
+      return this;
+    }
+
+    const selectorOrder = this.selectorsOrder['pseudo-class'];
+    if (selectorOrder < this.lastCall) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    copyOfBuilder.lastCall = selectorOrder;
+    if (!this.isOriginal) {
+      copyOfBuilder.selectorsList = this.selectorsList;
+      copyOfBuilder.callLimits = this.callLimits;
+    }
+
+    const prefix = ':';
+    copyOfBuilder.selectorsList.push(prefix + name);
+    return copyOfBuilder;
+  }
+
+  pseudoElement(name) {
+    if (!name) {
+      return this;
+    }
+
+    const selectorOrder = this.selectorsOrder['pseudo-element'];
+    if (selectorOrder < this.lastCall) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    copyOfBuilder.lastCall = selectorOrder;
+    if (!this.isOriginal) {
+      copyOfBuilder.selectorsList = this.selectorsList;
+      copyOfBuilder.callLimits = this.callLimits;
+    }
+
+    if (copyOfBuilder.callLimits.pseudoElement > 0) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    } else {
+      copyOfBuilder.callLimits.pseudoElement += 1;
+    }
+
+    const prefix = '::';
+    copyOfBuilder.selectorsList.push(prefix + name);
+    return copyOfBuilder;
+  }
+
+  combine(selector1, combinator, selector2) {
+    if (!selector1 || !combinator || !selector2) {
+      return this;
+    }
+
+    const copyOfBuilder = new CssBuilder(false);
+    const firstSelectorRaw = selector1.selectorsList;
+    const secondSelectorRaw = selector2.selectorsList;
+
+    const combinedSelectors = [
+      ...firstSelectorRaw,
+      ` ${combinator} `,
+      ...secondSelectorRaw,
+    ];
+
+    copyOfBuilder.selectorsList = combinedSelectors;
+    return copyOfBuilder;
+  }
+
+  stringify() {
+    const stringifiedSelectors = this.selectorsList.join('');
+    this.selectorsList = [];
+    return stringifiedSelectors;
+  }
+}
+
+const cssSelectorBuilder = new CssBuilder(true);
 
 module.exports = {
   shallowCopy,
